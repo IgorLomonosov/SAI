@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лабораторна робота №1: XOR Персептрон</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --success-color: #16a34a;
+            --danger-color: #dc2626;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #111827;
+        }
+
+        .main-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1200px;
+            width: 100%;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 24px;
+            flex: 1;
+            min-width: 350px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: var(--primary-color);
+        }
+
+        .card-header span {
+            font-size: 0.875rem;
+            color: #6b7280;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        label {
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        input[type="number"] {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            width: 60px;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #15803d;
+        }
+
+        button.secondary-btn {
+            background-color: var(--primary-color);
+            margin-top: 15px;
+        }
+        button.secondary-btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        .result-box {
+            background-color: #ecfdf5;
+            border: 1px solid #6ee7b7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--success-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            border: 1px solid #e5e7eb;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+
+        canvas {
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            background-color: #fff;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .legend {
+            margin-top: 15px;
+            font-size: 0.85rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .color-box {
+            width: 12px;
+            height: 12px;
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+
+        .equations {
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Лабораторна робота №1: Нейронна мережа XOR</h1>
+
+    <div class="main-container">
+        
+        <div class="card">
+            <div class="card-header">
+                <h2>Завдання №1</h2>
+                <span>Реалізація обчислювального алгоритму (Персептрон)</span>
+            </div>
+
+            <div style="background: #fffbe6; padding: 10px; border-radius: 6px; margin-bottom: 20px; font-size: 0.9rem; border-left: 4px solid #fbbf24;">
+                <strong>Логіка:</strong> XOR реалізується як композиція: <br>
+                <em>Result = OR(x1, x2) AND [NOT AND(x1, x2)]</em>
+            </div>
+
+            <div class="input-group">
+                <div>
+                    <label for="inputX1">x1:</label>
+                    <input type="number" id="inputX1" min="0" max="1" value="0">
+                </div>
+                <div>
+                    <label for="inputX2">x2:</label>
+                    <input type="number" id="inputX2" min="0" max="1" value="1">
+                </div>
+            </div>
+
+            <button onclick="calculateManualInput()">Обчислити (Запуск алгоритму)</button>
+
+            <div class="result-box">
+                <div>Фінальний результат (XOR):</div>
+                <div id="finalOutput" class="result-value">-</div>
+            </div>
+
+            <h3>Таблиця істинності (генерована):</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>x1</th>
+                        <th>x2</th>
+                        <th>OR (y1)</th>
+                        <th>AND (y2)</th>
+                        <th>XOR (Res)</th>
+                    </tr>
+                </thead>
+                <tbody id="truthTableBody">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Завдання №2</h2>
+                <span>Двошаровий персептрон та візуалізація</span>
+            </div>
+
+            <canvas id="xorCanvas" width="400" height="400"></canvas>
+
+            <div class="equations">
+                <strong>Рівняння прямих (межі нейронів):</strong><br>
+                <span style="color: #16a34a">■</span> x1 + x2 - 0.5 = 0 (OR поріг)<br>
+                <span style="color: #9333ea">■</span> x1 + x2 - 1.5 = 0 (AND поріг)
+            </div>
+
+            <div class="legend">
+                <strong>Пояснення графіку:</strong>
+                <div class="legend-item">
+                    <div class="color-box" style="background-color: #ef4444;"></div>
+                    <span>Червоні точки: Клас 0 (False) - [0,0] та [1,1]</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box" style="background-color: #2563eb;"></div>
+                    <span>Сині точки: Клас 1 (True) - [0,1] та [1,0]</span>
+                </div>
+            </div>
+
+            <button class="secondary-btn" onclick="drawGraph()">Перегенерувати точки</button>
+        </div>
+    </div>
+
+    <script>
+        function stepFunction(v) {
+            return v > 0 ? 1 : 0;
+        }
+
+        function neuronOR(x1, x2) {
+            let v = 1 * x1 + 1 * x2 - 0.5;
+            return stepFunction(v);
+        }
+
+        function neuronAND(x1, x2) {
+            let v = 1 * x1 + 1 * x2 - 1.5;
+            return stepFunction(v);
+        }
+
+        function neuronXOR(y1, y2) {
+            let v = 1 * y1 + (-1) * y2 - 0.5;
+            return stepFunction(v);
+        }
+
+        function runNetwork(x1, x2) {
+            const y1 = neuronOR(x1, x2);  
+            const y2 = neuronAND(x1, x2); 
+            const res = neuronXOR(y1, y2); 
+            return { y1, y2, res };
+        }
+
+
+        function calculateManualInput() {
+            const x1 = parseFloat(document.getElementById('inputX1').value);
+            const x2 = parseFloat(document.getElementById('inputX2').value);
+            
+            const result = runNetwork(x1, x2);
+            
+            const outputEl = document.getElementById('finalOutput');
+            outputEl.innerText = result.res;
+            
+            outputEl.style.color = result.res === 1 ? 'var(--primary-color)' : 'var(--danger-color)';
+        }
+
+        function generateTruthTable() {
+            const inputs = [[0,0], [0,1], [1,0], [1,1]];
+            const tbody = document.getElementById('truthTableBody');
+            tbody.innerHTML = '';
+
+            inputs.forEach(pair => {
+                const res = runNetwork(pair[0], pair[1]);
+                const row = `<tr>
+                    <td>${pair[0]}</td>
+                    <td>${pair[1]}</td>
+                    <td>${res.y1}</td>
+                    <td>${res.y2}</td>
+                    <td style="font-weight:bold; color:${res.res === 1 ? 'blue' : 'red'}">${res.res}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+
+        function drawGraph() {
+            const canvas = document.getElementById('xorCanvas');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            const scale = 300; 
+            const offsetX = 50;
+            const offsetY = 350; 
+
+            ctx.clearRect(0, 0, width, height);
+
+            function toCanvas(x, y) {
+                return {
+                    px: offsetX + x * scale,
+                    py: offsetY - y * scale
+                };
+            }
+
+            ctx.beginPath();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.moveTo(offsetX, offsetY);
+            ctx.lineTo(offsetX, 20);
+            ctx.moveTo(offsetX, offsetY);
+            ctx.lineTo(width - 20, offsetY);
+            ctx.stroke();
+
+            ctx.font = "14px Arial";
+            ctx.fillStyle = "#000";
+            ctx.fillText("0", offsetX - 15, offsetY + 15);
+            ctx.fillText("1", offsetX + scale - 5, offsetY + 20); // x=1
+            ctx.fillText("x1", width - 30, offsetY + 5);
+            
+            ctx.fillText("1", offsetX - 20, offsetY - scale + 5); // y=1
+            ctx.fillText("x2", offsetX - 10, 20);
+
+            ctx.beginPath();
+            ctx.strokeStyle = '#16a34a'; 
+            ctx.lineWidth = 3;
+            let startOR = toCanvas(0, 0.5);
+            let endOR = toCanvas(0.5, 0);
+            ctx.moveTo(startOR.px, startOR.py);
+            ctx.lineTo(endOR.px, endOR.py);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.strokeStyle = '#9333ea';
+            ctx.lineWidth = 3;
+            let startAND = toCanvas(0.5, 1); 
+            let endAND = toCanvas(1, 0.5); 
+            let farStart = toCanvas(0.3, 1.2);
+            let farEnd = toCanvas(1.2, 0.3);
+            ctx.moveTo(farStart.px, farStart.py);
+            ctx.lineTo(farEnd.px, farEnd.py);
+            ctx.stroke();
+
+            const numPoints = 200; 
+            
+            for(let i=0; i<numPoints; i++) {
+                let randX1 = Math.random() * 1.2 - 0.1;
+                let randX2 = Math.random() * 1.2 - 0.1;
+
+                let result = runNetwork(randX1, randX2);
+
+                let pos = toCanvas(randX1, randX2);
+
+                ctx.beginPath();
+                ctx.fillStyle = result.res === 1 ? '#2563eb' : '#ef4444';
+                ctx.arc(pos.px, pos.py, 4, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+
+            const corners = [[0,0], [0,1], [1,0], [1,1]];
+            corners.forEach(p => {
+                let res = runNetwork(p[0], p[1]);
+                let pos = toCanvas(p[0], p[1]);
+                
+                ctx.beginPath();
+                ctx.arc(pos.px, pos.py, 8, 0, 2 * Math.PI);
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = 2;
+                ctx.fillStyle = res.res === 1 ? '#2563eb' : '#ef4444'; 
+                ctx.stroke();
+            });
+        }
+
+        window.onload = function() {
+            generateTruthTable();
+            drawGraph();
+        };
+
+    </script>
+</body>
+</html>
